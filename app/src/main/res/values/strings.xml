@@ -41,6 +41,8 @@
     <string name="save">Save</string>
     <string name="saved">Saved</string>
     <string name="removed">Removed</string>
+    <string name="share_action">Share this shloka</string>
+    <string name="share_chooser_title">Share shloka card</string>
     <string name="open_menu_cd">Open chapters, saved shlokas, and settings</string>
     <string name="show_tools">Show reading tools</string>
     <string name="hide_tools">Hide reading tools</string>

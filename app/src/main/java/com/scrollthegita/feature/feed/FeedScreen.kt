@@ -30,13 +30,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scrollthegita.R
 import com.scrollthegita.core.design.CalmMessage
 import com.scrollthegita.core.design.GitaSpacing
+import com.scrollthegita.core.model.Shloka
 import com.scrollthegita.feature.details.ShlokaDetailsSheet
+import com.scrollthegita.feature.share.ShlokaCardRenderer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -53,6 +57,7 @@ fun FeedRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val request by navigator.request.collectAsStateWithLifecycle()
     val pauseVisible by viewModel.pause.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     LaunchedEffect(requestedShlokaId) {
         if (requestedShlokaId.isNotBlank()) navigator.open(requestedShlokaId)
     }
@@ -69,6 +74,15 @@ fun FeedRoute(
         onOpenChapters = onOpenChapters,
         onOpenLibrary = onOpenLibrary,
         onOpenSettings = onOpenSettings,
+        onShareShloka = { shloka ->
+            (state as? FeedUiState.Content)?.let { content ->
+                ShlokaCardRenderer.shareShloka(
+                    context = context,
+                    shloka = shloka,
+                    preferences = content.preferences,
+                )
+            }
+        },
     )
 }
 
@@ -86,6 +100,7 @@ fun FeedScreen(
     onOpenChapters: () -> Unit,
     onOpenLibrary: () -> Unit,
     onOpenSettings: () -> Unit,
+    onShareShloka: (Shloka) -> Unit = {},
 ) {
     when (val current = state) {
         FeedUiState.Loading -> InsetMessage(
@@ -113,6 +128,7 @@ fun FeedScreen(
             onOpenChapters = onOpenChapters,
             onOpenLibrary = onOpenLibrary,
             onOpenSettings = onOpenSettings,
+            onShareShloka = onShareShloka,
         )
     }
 }
@@ -144,6 +160,7 @@ private fun FeedPager(
     onOpenChapters: () -> Unit,
     onOpenLibrary: () -> Unit,
     onOpenSettings: () -> Unit,
+    onShareShloka: (Shloka) -> Unit,
 ) {
     val pagerState = rememberPagerState(
         initialPage = content.resumeIndex.coerceIn(0, content.shlokas.lastIndex),
@@ -173,7 +190,9 @@ private fun FeedPager(
     }
     VerticalPager(
         state = pagerState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("feed_pager"),
         beyondViewportPageCount = 1,
         key = { page -> content.shlokas[page].id },
     ) { page ->
@@ -188,6 +207,7 @@ private fun FeedPager(
             onToggleChrome = { chromeVisible = !chromeVisible },
             onUnderstand = onOpenDetails,
             onToggleBookmark = onToggleBookmark,
+            onShare = { onShareShloka(shloka) },
             onOpenMenu = {
                 onDismissDetails()
                 menuOpen = true
@@ -203,15 +223,26 @@ private fun FeedPager(
     if (pauseVisible) {
         AlertDialog(
             onDismissRequest = onDismissPause,
-            title = { Text(stringResource(R.string.pause_title)) },
-            text = { Text(stringResource(R.string.pause_body)) },
+            modifier = Modifier.testTag("pause_dialog"),
+            title = { Text(stringResource(R.string.pause_title), modifier = Modifier.testTag("pause_title")) },
+            text = { Text(stringResource(R.string.pause_body), modifier = Modifier.testTag("pause_body")) },
             confirmButton = {
-                TextButton(onClick = onDismissPause, modifier = Modifier.heightIn(min = GitaSpacing.minTouch)) {
+                TextButton(
+                    onClick = onDismissPause,
+                    modifier = Modifier
+                        .heightIn(min = GitaSpacing.minTouch)
+                        .testTag("btn_pause_continue"),
+                ) {
                     Text(stringResource(R.string.pause_continue))
                 }
             },
             dismissButton = {
-                TextButton(onClick = onDismissPause, modifier = Modifier.heightIn(min = GitaSpacing.minTouch)) {
+                TextButton(
+                    onClick = onDismissPause,
+                    modifier = Modifier
+                        .heightIn(min = GitaSpacing.minTouch)
+                        .testTag("btn_pause_here"),
+                ) {
                     Text(stringResource(R.string.pause_here))
                 }
             },
@@ -260,18 +291,18 @@ private fun ReadingMenuSheet(
                 text = stringResource(R.string.menu_title),
                 style = MaterialTheme.typography.titleMedium,
             )
-            MenuAction(stringResource(R.string.menu_chapters), onChapters)
-            MenuAction(stringResource(R.string.menu_saved), onSaved)
-            MenuAction(stringResource(R.string.menu_settings), onSettings)
+            MenuAction(stringResource(R.string.menu_chapters), onChapters, modifier = Modifier.testTag("menu_chapters"))
+            MenuAction(stringResource(R.string.menu_saved), onSaved, modifier = Modifier.testTag("menu_saved"))
+            MenuAction(stringResource(R.string.menu_settings), onSettings, modifier = Modifier.testTag("menu_settings"))
         }
     }
 }
 
 @Composable
-private fun MenuAction(label: String, onClick: () -> Unit) {
+private fun MenuAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     TextButton(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(min = GitaSpacing.minTouch),
     ) {

@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -63,6 +64,7 @@ fun ShlokaPage(
     onUnderstand: () -> Unit,
     onToggleBookmark: () -> Unit,
     onOpenMenu: () -> Unit,
+    onShare: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var motionPaused by remember { mutableStateOf(false) }
@@ -103,10 +105,24 @@ fun ShlokaPage(
                     text = stringResource(R.string.chapter_verse, shloka.chapter, shloka.verse),
                     style = MaterialTheme.typography.labelLarge,
                     color = LocalGitaPalette.current.verseLabel,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("shloka_chapter_verse"),
                 )
                 if (chromeVisible) {
-                    IconButton(onClick = onOpenMenu) {
+                    IconButton(
+                        onClick = onShare,
+                        modifier = Modifier.testTag("btn_share"),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = stringResource(R.string.share_action),
+                        )
+                    }
+                    IconButton(
+                        onClick = onOpenMenu,
+                        modifier = Modifier.testTag("btn_menu"),
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Menu,
                             contentDescription = stringResource(R.string.open_menu_cd),
@@ -209,7 +225,8 @@ fun ShlokaPage(
                     onClick = onUnderstand,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = GitaSpacing.minTouch),
+                        .heightIn(min = GitaSpacing.minTouch)
+                        .testTag("btn_understand"),
                 ) {
                     Text(stringResource(R.string.understand))
                 }
@@ -220,7 +237,9 @@ fun ShlokaPage(
                 ) {
                     TextButton(
                         onClick = onToggleBookmark,
-                        modifier = Modifier.heightIn(min = GitaSpacing.minTouch),
+                        modifier = Modifier
+                            .heightIn(min = GitaSpacing.minTouch)
+                            .testTag("btn_save"),
                     ) {
                         Text(
                             text = if (bookmarked) stringResource(R.string.saved) else stringResource(R.string.save),
@@ -230,6 +249,7 @@ fun ShlokaPage(
                         text = stringResource(R.string.reading_position, shloka.chapter, shloka.verse),
                         style = MaterialTheme.typography.labelLarge,
                         color = LocalGitaPalette.current.verseLabel,
+                        modifier = Modifier.testTag("shloka_reading_position"),
                     )
                 }
                 bookmarkNote?.let { note ->
