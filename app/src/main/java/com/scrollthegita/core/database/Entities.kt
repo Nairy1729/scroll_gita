@@ -3,8 +3,18 @@ package com.scrollthegita.core.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Fts4
 import androidx.room.Index
 import androidx.room.PrimaryKey
+
+@Entity(tableName = "shlokas_fts")
+@Fts4(contentEntity = ShlokaEntity::class)
+data class ShlokaFts(
+    val sanskrit: String,
+    val transliteration: String,
+    @ColumnInfo(name = "translationEnglish") val translation: String,
+    val simpleMeaning: String,
+)
 
 @Entity(
     tableName = "shlokas",

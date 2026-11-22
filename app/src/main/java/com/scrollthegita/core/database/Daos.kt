@@ -92,6 +92,27 @@ interface ReadingHistoryDao {
 interface SearchDao {
     @Query(
         """
+        SELECT shlokas.* FROM shlokas
+        JOIN shlokas_fts ON shlokas.rowid = shlokas_fts.rowid
+        WHERE shlokas_fts MATCH :query
+        """,
+    )
+    suspend fun searchFts(query: String): List<ShlokaEntity>
+
+    @Query(
+        """
+        SELECT shlokas.id FROM shlokas
+        JOIN shlokas_fts ON shlokas.rowid = shlokas_fts.rowid
+        WHERE shlokas_fts MATCH :query
+        """,
+    )
+    suspend fun searchFtsIds(query: String): List<String>
+
+    @Query("SELECT * FROM shlokas WHERE searchTransliteration LIKE :like ESCAPE '\\'")
+    suspend fun searchTransliteration(like: String): List<ShlokaEntity>
+
+    @Query(
+        """
         SELECT shlokas.id FROM shlokas
         INNER JOIN chapters ON chapters.number = shlokas.chapter
         WHERE shlokas.id = :exactId

@@ -43,7 +43,11 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): GitaDatabase =
         Room.databaseBuilder(context, GitaDatabase::class.java, "scroll_the_gita.db")
-            .addMigrations(GitaMigrations.MIGRATION_1_2, GitaMigrations.MIGRATION_2_3)
+            .addMigrations(
+                GitaMigrations.MIGRATION_1_2,
+                GitaMigrations.MIGRATION_2_3,
+                GitaMigrations.MIGRATION_3_4,
+            )
             .build()
 
     @Provides

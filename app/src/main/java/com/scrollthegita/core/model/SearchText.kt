@@ -27,6 +27,18 @@ object SearchText {
             .replace("_", "\\_")
         return "%$escaped%"
     }
+
+    /**
+     * Builds a safe FTS4 prefix query from raw user input.
+     * Normalises Latin diacritics, strips punctuation/special syntax characters,
+     * and appends '*' to each token for partial/prefix matching.
+     */
+    fun ftsQuery(raw: String): String {
+        val normalized = normalize(raw)
+        val tokens = normalized.split(Regex("[^\\p{L}\\p{N}\\p{M}]+")).filter { it.isNotBlank() }
+        if (tokens.isEmpty()) return ""
+        return tokens.joinToString(" ") { "$it*" }
+    }
 }
 
 object VerseReference {

@@ -57,4 +57,51 @@ object GitaMigrations {
             )
         }
     }
+
+    /**
+     * Version 4 adds the FTS4 virtual table for full-text search across Sanskrit, transliteration,
+     * English translation, and simple meaning, backed by the shlokas table via rowid.
+     */
+    val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS `shlokas_fts` USING FTS4(
+                  `sanskrit` TEXT NOT NULL,
+                  `transliteration` TEXT NOT NULL,
+                  `translationEnglish` TEXT NOT NULL,
+                  `simpleMeaning` TEXT NOT NULL,
+                  content=`shlokas`
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_BEFORE_UPDATE BEFORE UPDATE ON `shlokas`
+                BEGIN DELETE FROM `shlokas_fts` WHERE `docid`=OLD.`rowid`; END
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_BEFORE_DELETE BEFORE DELETE ON `shlokas`
+                BEGIN DELETE FROM `shlokas_fts` WHERE `docid`=OLD.`rowid`; END
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_AFTER_UPDATE AFTER UPDATE ON `shlokas`
+                BEGIN INSERT INTO `shlokas_fts`(`docid`, `sanskrit`, `transliteration`, `translationEnglish`, `simpleMeaning`)
+                VALUES (NEW.`rowid`, NEW.`sanskrit`, NEW.`transliteration`, NEW.`translationEnglish`, NEW.`simpleMeaning`); END
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_AFTER_INSERT AFTER INSERT ON `shlokas`
+                BEGIN INSERT INTO `shlokas_fts`(`docid`, `sanskrit`, `transliteration`, `translationEnglish`, `simpleMeaning`)
+                VALUES (NEW.`rowid`, NEW.`sanskrit`, NEW.`transliteration`, NEW.`translationEnglish`, NEW.`simpleMeaning`); END
+                """.trimIndent(),
+            )
+            db.execSQL("INSERT INTO `shlokas_fts`(`shlokas_fts`) VALUES('rebuild')")
+        }
+    }
 }

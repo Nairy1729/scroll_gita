@@ -42,6 +42,7 @@ import com.scrollthegita.feature.feed.FeedRoute
 import com.scrollthegita.feature.feed.activityReadingNavigator
 import com.scrollthegita.feature.library.LibraryScreen
 import com.scrollthegita.feature.onboarding.OnboardingScreen
+import com.scrollthegita.feature.search.SearchScreen
 import com.scrollthegita.feature.settings.SettingsScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -178,9 +179,19 @@ fun GitaNavHost(startDestination: String) {
         composable(Routes.CHAPTERS) {
             ChaptersScreen(
                 onBack = { navController.popBackStack() },
+                onOpenSearch = { navController.navigate(Routes.SEARCH) },
                 onOpenShloka = { id ->
                     navigator.open(id)
                     navController.popBackStack()
+                },
+            )
+        }
+        composable(Routes.SEARCH) {
+            SearchScreen(
+                onBack = { navController.popBackStack() },
+                onOpenShloka = { id ->
+                    navigator.open(id)
+                    navController.popBackStack(Routes.FEED, inclusive = false)
                 },
             )
         }

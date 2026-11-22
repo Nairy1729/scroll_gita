@@ -79,6 +79,14 @@
     <string name="save_reflection_future">Coming later. When this is added, reflections stay on this device. Nothing is shared.</string>
 
     <string name="chapters_title">Chapters</string>
+    <string name="search_action">Search shlokas</string>
+    <string name="search_title">Search</string>
+    <string name="search_placeholder">Search by Sanskrit, meaning, or verse…</string>
+    <string name="search_clear">Clear search query</string>
+    <string name="search_no_results_title">No matching shlokas</string>
+    <string name="search_no_results_body">Try different words, a verse number like 2.47, or a transliteration.</string>
+    <string name="search_idle_title">Search the Gita</string>
+    <string name="search_idle_body">Type a Sanskrit word, English meaning, or verse reference like 2.47.</string>
     <string name="chapter_number">Chapter %1$d</string>
     <string name="traditional_count">Traditional count, edition-dependent: %1$d</string>
     <string name="available_count">%1$d shlokas in this reading</string>

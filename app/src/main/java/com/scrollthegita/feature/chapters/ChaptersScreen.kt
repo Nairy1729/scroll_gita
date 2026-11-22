@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -34,6 +39,7 @@ import com.scrollthegita.feature.common.QuietTopBar
 @Composable
 fun ChaptersScreen(
     onBack: () -> Unit,
+    onOpenSearch: () -> Unit = {},
     onOpenShloka: (String) -> Unit,
     viewModel: ChaptersViewModel = hiltViewModel(),
 ) {
@@ -46,7 +52,21 @@ fun ChaptersScreen(
                 WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
             ),
     ) {
-        QuietTopBar(title = stringResource(R.string.chapters_title), onBack = onBack)
+        QuietTopBar(
+            title = stringResource(R.string.chapters_title),
+            onBack = onBack,
+            actions = {
+                IconButton(
+                    onClick = onOpenSearch,
+                    modifier = Modifier.testTag("btn_search"),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = stringResource(R.string.search_action),
+                    )
+                }
+            },
+        )
         when (val current = state) {
             ChaptersUiState.Loading -> CalmMessage(stringResource(R.string.loading), stringResource(R.string.loading_cd))
             is ChaptersUiState.Error -> CalmMessage(stringResource(R.string.error_title), stringResource(R.string.error_body))

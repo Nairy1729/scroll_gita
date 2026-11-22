@@ -19,15 +19,56 @@ class SearchRepositoryImpl @Inject constructor(
         val query = rawQuery.trim()
         if (query.isEmpty()) return emptyList()
         val exactId = VerseReference.parse(query)
-        val ids = searchDao.searchIds(
-            exactId = exactId.orEmpty(),
-            filter = filter.name,
-            like = SearchText.likePattern(query),
-        )
-        if (ids.isEmpty()) return emptyList()
         val normalized = SearchText.normalize(query)
+        val ftsQuery = SearchText.ftsQuery(query)
+
+        val exactEntities = if (exactId != null) {
+            searchDao.findShlokas(listOf(exactId))
+        } else {
+            emptyList()
+        }
+
+        val ftsEntities = if (ftsQuery.isNotEmpty()) {
+            try {
+                searchDao.searchFts(ftsQuery)
+            } catch (_: Exception) {
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+
+        val transliterationEntities = if (normalized.isNotEmpty()) {
+            try {
+                searchDao.searchTransliteration(SearchText.likePattern(query))
+            } catch (_: Exception) {
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+
+        val fallbackIds = if (exactEntities.isEmpty() && ftsEntities.isEmpty() && transliterationEntities.isEmpty()) {
+            searchDao.searchIds(
+                exactId = exactId.orEmpty(),
+                filter = filter.name,
+                like = SearchText.likePattern(query),
+            )
+        } else {
+            emptyList()
+        }
+        val fallbackEntities = if (fallbackIds.isNotEmpty()) {
+            searchDao.findShlokas(fallbackIds)
+        } else {
+            emptyList()
+        }
+
+        val allEntities = (exactEntities + ftsEntities + transliterationEntities + fallbackEntities)
+            .distinctBy { it.id }
+        if (allEntities.isEmpty()) return emptyList()
+
         val chapters = searchDao.chapters().map { it.toDomain() }.associateBy { it.number }
-        return searchDao.findShlokas(ids)
+        return allEntities
             .map { it.toDomain() }
             .map { shloka ->
                 val chapter = chapters[shloka.chapter]

@@ -9,8 +9,9 @@ import androidx.room.RoomDatabase
         ChapterEntity::class,
         BookmarkEntity::class,
         ReadingHistoryEntity::class,
+        ShlokaFts::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class GitaDatabase : RoomDatabase() {
