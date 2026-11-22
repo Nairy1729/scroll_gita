@@ -85,7 +85,7 @@ fun ShlokaPage(
             .pauseMotionWhileTouched { motionPaused = it },
     ) {
         SpiritualBackground(
-            style = shloka.backgroundStyle,
+            style = preferences.preferredBackgroundStyle ?: shloka.backgroundStyle,
             animationsEnabled = preferences.animationsEnabled,
             isPageActive = isPageActive,
             motionPaused = motionPaused,

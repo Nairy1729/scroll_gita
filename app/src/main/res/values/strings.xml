@@ -121,6 +121,17 @@
     <string name="theme_system">System</string>
     <string name="gentle_animation">Gentle animation</string>
     <string name="gentle_animation_support">Background motion only. The shloka stays still.</string>
+    <string name="background_style_title">Ambient background</string>
+    <string name="bg_style_adaptive">Adaptive (per shloka)</string>
+    <string name="bg_style_karma_sunrise">Drifting gradient</string>
+    <string name="bg_style_divine_cosmos">Particle dust</string>
+    <string name="bg_style_meditation_mandala">Mandala rotation</string>
+    <string name="bg_style_parchment_grain">Parchment grain</string>
+    <string name="bg_style_detachment_flow">Flowing stream</string>
+    <string name="bg_style_peace_lotus">Sacred lotus</string>
+    <string name="bg_style_wisdom_light">Wisdom light</string>
+    <string name="bg_style_devotion_aura">Devotion aura</string>
+    <string name="bg_style_courage_dawn">Courage dawn</string>
     <string name="text_size">Text size</string>
     <string name="text_size_value">%1$d percent</string>
     <string name="restart_onboarding">Review the introduction</string>

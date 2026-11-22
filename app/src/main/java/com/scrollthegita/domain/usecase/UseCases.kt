@@ -1,5 +1,6 @@
 package com.scrollthegita.domain.usecase
 
+import com.scrollthegita.core.model.BackgroundStyle
 import com.scrollthegita.core.model.Bookmark
 import com.scrollthegita.core.model.Chapter
 import com.scrollthegita.core.model.OnboardingDraft
@@ -79,6 +80,10 @@ class UpdateUserPreferencesUseCase @Inject constructor(
 
     suspend fun setMindfulPauses(enabled: Boolean) {
         repository.updatePreferences { it.copy(mindfulPauses = enabled) }
+    }
+
+    suspend fun setPreferredBackgroundStyle(style: BackgroundStyle?) {
+        repository.updatePreferences { it.copy(preferredBackgroundStyle = style) }
     }
 
     suspend fun resetOnboarding() = repository.resetOnboarding()

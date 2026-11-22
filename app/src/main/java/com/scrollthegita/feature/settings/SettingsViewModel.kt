@@ -3,6 +3,7 @@ package com.scrollthegita.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.scrollthegita.core.common.UserFacingError
+import com.scrollthegita.core.model.BackgroundStyle
 import com.scrollthegita.core.model.PreferredLanguage
 import com.scrollthegita.core.model.ThemeMode
 import com.scrollthegita.core.model.UserPreferences
@@ -39,6 +40,9 @@ class SettingsViewModel @Inject constructor(
     fun setAnimations(enabled: Boolean) = launch { updatePreferences.setAnimationsEnabled(enabled) }
     fun setTheme(mode: ThemeMode) = launch { updatePreferences.setThemeMode(mode) }
     fun setTextScale(scale: Float) = launch { updatePreferences.setTextScale(scale) }
+    fun setPreferredBackgroundStyle(style: BackgroundStyle?) = launch {
+        updatePreferences.setPreferredBackgroundStyle(style)
+    }
 
     fun restartOnboarding(onRestarted: () -> Unit) {
         viewModelScope.launch {

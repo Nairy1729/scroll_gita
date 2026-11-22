@@ -1,5 +1,6 @@
 package com.scrollthegita
 
+import com.scrollthegita.core.model.BackgroundStyle
 import com.scrollthegita.core.model.OnboardingDraft
 import com.scrollthegita.core.model.PreferredLanguage
 import com.scrollthegita.core.model.ReadingProgress
@@ -47,6 +48,20 @@ class SettingsViewModelTest {
             it is SettingsUiState.Content && it.preferences.preferredLanguage == PreferredLanguage.HINDI
         } as SettingsUiState.Content
         assertEquals(PreferredLanguage.HINDI, content.preferences.preferredLanguage)
+    }
+
+    @Test
+    fun backgroundStyleSelectionUpdatesUiState() = runBlocking {
+        val repository = FakeUserSettingsRepository()
+        val viewModel = SettingsViewModel(
+            ObserveUserPreferencesUseCase(repository),
+            UpdateUserPreferencesUseCase(repository),
+        )
+        viewModel.setPreferredBackgroundStyle(BackgroundStyle.PARCHMENT_GRAIN)
+        val content = viewModel.state.first {
+            it is SettingsUiState.Content && it.preferences.preferredBackgroundStyle == BackgroundStyle.PARCHMENT_GRAIN
+        } as SettingsUiState.Content
+        assertEquals(BackgroundStyle.PARCHMENT_GRAIN, content.preferences.preferredBackgroundStyle)
     }
 }
 

@@ -9,6 +9,7 @@ enum class BackgroundStyle {
     MEDITATION_MANDALA,
     COURAGE_DAWN,
     DIVINE_COSMOS,
+    PARCHMENT_GRAIN,
 }
 
 enum class ShlokaTheme {
@@ -119,6 +120,7 @@ data class UserPreferences(
     val themeMode: ThemeMode = ThemeMode.DARK,
     val textScale: Float = 1f,
     val mindfulPauses: Boolean = true,
+    val preferredBackgroundStyle: BackgroundStyle? = null,
 )
 
 data class OnboardingDraft(

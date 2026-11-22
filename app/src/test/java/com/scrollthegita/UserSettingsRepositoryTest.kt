@@ -1,6 +1,7 @@
 package com.scrollthegita
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.scrollthegita.core.model.BackgroundStyle
 import com.scrollthegita.core.model.OnboardingDraft
 import com.scrollthegita.core.model.PreferredLanguage
 import com.scrollthegita.core.model.ReadingProgress
@@ -45,10 +46,17 @@ class UserSettingsRepositoryTest {
     @Test
     fun preferenceEditsRoundTrip() = runBlocking {
         val repository = repository()
-        repository.updatePreferences { it.copy(themeMode = ThemeMode.PARCHMENT, textScale = 1.2f) }
+        repository.updatePreferences {
+            it.copy(
+                themeMode = ThemeMode.PARCHMENT,
+                textScale = 1.2f,
+                preferredBackgroundStyle = BackgroundStyle.DIVINE_COSMOS,
+            )
+        }
         val saved = repository.observePreferences().first()
         assertEquals(ThemeMode.PARCHMENT, saved.themeMode)
         assertEquals(1.2f, saved.textScale, 0.001f)
+        assertEquals(BackgroundStyle.DIVINE_COSMOS, saved.preferredBackgroundStyle)
     }
 
     private fun repository(): UserSettingsRepositoryImpl {

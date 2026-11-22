@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.scrollthegita.core.model.BackgroundStyle
 import com.scrollthegita.core.model.OnboardingDraft
 import com.scrollthegita.core.model.PreferredLanguage
 import com.scrollthegita.core.model.ReadingProgress
@@ -71,6 +72,9 @@ class UserSettingsRepositoryImpl @Inject constructor(
         themeMode = this[Keys.THEME].toEnum(ThemeMode.DARK),
         textScale = (this[Keys.TEXT_SCALE] ?: 1f).coerceIn(0.85f, 1.35f),
         mindfulPauses = this[Keys.MINDFUL_PAUSES] ?: true,
+        preferredBackgroundStyle = this[Keys.BACKGROUND_STYLE]?.let { name ->
+            runCatching { BackgroundStyle.valueOf(name) }.getOrNull()
+        },
     )
 
     private fun MutablePreferences.writeUserPreferences(value: UserPreferences) {
@@ -82,6 +86,11 @@ class UserSettingsRepositoryImpl @Inject constructor(
         this[Keys.THEME] = value.themeMode.name
         this[Keys.TEXT_SCALE] = value.textScale
         this[Keys.MINDFUL_PAUSES] = value.mindfulPauses
+        if (value.preferredBackgroundStyle != null) {
+            this[Keys.BACKGROUND_STYLE] = value.preferredBackgroundStyle.name
+        } else {
+            this.remove(Keys.BACKGROUND_STYLE)
+        }
     }
 
     private fun Preferences.toProgress(): ReadingProgress? {
@@ -108,6 +117,7 @@ class UserSettingsRepositoryImpl @Inject constructor(
         val THEME = stringPreferencesKey("theme_mode")
         val TEXT_SCALE = floatPreferencesKey("text_scale")
         val MINDFUL_PAUSES = booleanPreferencesKey("mindful_pauses")
+        val BACKGROUND_STYLE = stringPreferencesKey("preferred_background_style")
         val LAST_ID = stringPreferencesKey("last_shloka_id")
         val LAST_CHAPTER = intPreferencesKey("last_chapter")
         val LAST_VERSE = intPreferencesKey("last_verse")
