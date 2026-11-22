@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Reflections stay on this device. Bookmarks and the reading database are not listed here. -->
+    <exclude domain="database" path="gita_private.db" />
+    <exclude domain="database" path="gita_private.db-shm" />
+    <exclude domain="database" path="gita_private.db-wal" />
+</full-backup-content>

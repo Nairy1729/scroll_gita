@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scrollthegita.local/content/gita-content.schema.json",
+  "title": "Scroll the Gita content file",
+  "description": "Offline edition file. Do not put unverified or unlicensed Gita text in this file. The app does not download it. A missing assets/content/gita.json leaves the sample seed in place. A file that fails validation is logged and ignored.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "contentVersion",
+    "editionTitle",
+    "translator",
+    "reviewer",
+    "licenseStatement",
+    "sourceReference",
+    "chapters",
+    "shlokas"
+  ],
+  "properties": {
+    "contentVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Edition revision, for example 2026.1. Stored on each imported shloka."
+    },
+    "editionTitle": { "type": "string", "minLength": 1 },
+    "translator": { "type": "string", "minLength": 1 },
+    "reviewer": { "type": "string", "minLength": 1 },
+    "licenseStatement": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Copyright or license that allows this text to ship in the app."
+    },
+    "sourceReference": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Bibliographic reference for the edition. This is not a substitute for the per-shloka source attribution."
+    },
+    "chapters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/chapter" }
+    },
+    "shlokas": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/shloka" }
+    }
+  },
+  "$defs": {
+    "chapter": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["number", "nameSanskrit", "nameEnglish", "summary", "totalShlokas"],
+      "properties": {
+        "number": { "type": "integer", "minimum": 1, "maximum": 18 },
+        "nameSanskrit": { "type": "string", "minLength": 1 },
+        "nameEnglish": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "totalShlokas": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200,
+          "description": "Verse count for this edition. Counts differ between editions. A shloka verse must fall inside this count."
+        },
+        "isContentComplete": {
+          "type": "boolean",
+          "description": "True only when this package contains the full approved chapter. Omitted or false means the local rows are an incomplete reading. The app does not infer completeness from how many rows are stored."
+        }
+      }
+    },
+    "shloka": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "chapter",
+        "verse",
+        "sanskrit",
+        "transliteration",
+        "translationEnglish",
+        "simpleMeaning",
+        "reflectionPrompt",
+        "themes",
+        "backgroundStyle",
+        "sourceTitle",
+        "sourceAttribution",
+        "sortOrder",
+        "reviewStatus"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*\\.[1-9][0-9]*$",
+          "description": "Stable id. Format is chapter.verse with no leading zeros, such as 2.47. Bookmarks and reading progress use this id. Reuse it when replacing a sample row."
+        },
+        "chapter": { "type": "integer", "minimum": 1, "maximum": 18 },
+        "verse": { "type": "integer", "minimum": 1 },
+        "sanskrit": { "type": "string", "minLength": 1 },
+        "transliteration": { "type": "string", "minLength": 1 },
+        "translationEnglish": { "type": "string", "minLength": 1 },
+        "translationHindi": { "type": ["string", "null"] },
+        "simpleMeaning": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A short explanation. The app labels this as orientation, not as the translation."
+        },
+        "reflectionPrompt": { "type": "string", "minLength": 1 },
+        "themes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "backgroundStyle": {
+          "enum": [
+            "KARMA_SUNRISE",
+            "PEACE_LOTUS",
+            "WISDOM_LIGHT",
+            "DETACHMENT_FLOW",
+            "DEVOTION_AURA",
+            "MEDITATION_MANDALA",
+            "COURAGE_DAWN",
+            "DIVINE_COSMOS"
+          ]
+        },
+        "sourceTitle": { "type": "string", "minLength": 1 },
+        "sourceAttribution": { "type": "string", "minLength": 1 },
+        "sortOrder": {
+          "type": "integer",
+          "description": "Must equal chapter * 1000 + verse."
+        },
+        "reviewStatus": { "enum": ["SAMPLE", "DRAFT", "REVIEWED", "APPROVED"] },
+        "editionTitle": { "type": "string" },
+        "translator": { "type": "string" },
+        "reviewer": { "type": "string" },
+        "licenseStatement": { "type": "string" },
+        "sourceReference": { "type": "string" },
+        "contentVersion": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+## This file must NOT be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the Android SDK.
+# Copy this file to local.properties and set sdk.dir to your local Android SDK location.
+#
+# Examples:
+# Windows:
+#   sdk.dir=C\:\\Users\\<username>\\AppData\\Local\\Android\\Sdk
+# macOS:
+#   sdk.dir=/Users/<username>/Library/Android/sdk
+# Linux:
+#   sdk.dir=/home/<username>/Android/Sdk
+sdk.dir=

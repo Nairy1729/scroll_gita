@@ -1,0 +1,53 @@
+# Built application files
+*.apk
+*.aab
+*.ap_
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+app/build/
+**/build/
+
+# Gradle files
+.gradle/
+buildOutputCleanup/
+
+# Kotlin
+.kotlin/
+
+# Android Studio / IntelliJ IDEA
+*.iml
+.idea/
+!.idea/codeStyles/
+
+# Android SDK
+local.properties
+
+# Log files
+*.log
+
+# Android Studio captures and traces
+captures/
+**/captures/
+.externalNativeBuild/
+.cxx/
+
+# Profiler memory dumps
+*.hprof
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Keystores / Keys
+*.jks
+*.keystore
