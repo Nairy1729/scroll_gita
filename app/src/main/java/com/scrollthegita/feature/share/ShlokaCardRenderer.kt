@@ -1,5 +1,6 @@
 package com.scrollthegita.feature.share
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.createBitmap
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -214,7 +216,7 @@ object ShlokaCardRenderer {
     ): Bitmap {
         val width = format.width
         val height = format.height
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = android.graphics.Canvas(bitmap)
 
         val composeView = ComposeView(context).apply {
@@ -302,6 +304,7 @@ object ShlokaCardRenderer {
         return Intent.createChooser(sendIntent, context.getString(R.string.share_chooser_title))
     }
 
+    @SuppressLint("ThreadConstraint")
     fun shareShloka(
         context: Context,
         shloka: Shloka,

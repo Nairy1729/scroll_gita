@@ -4,7 +4,49 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Ambient radiating aura -->
     <path
         android:fillColor="#C8A24A"
-        android:pathData="M52,30h4v48h-4z" />
+        android:fillAlpha="0.15"
+        android:pathData="M54,26A28,28 0 1,0 54,82A28,28 0 1,0 54,26Z" />
+
+    <!-- Sacred manuscript scroll parchment -->
+    <path
+        android:fillColor="#1B223D"
+        android:strokeColor="#C8A24A"
+        android:strokeWidth="1.5"
+        android:pathData="M32,32h44a2,2 0 0,1 2,2v40a2,2 0 0,1 -2,2h-44a2,2 0 0,1 -2,-2v-40a2,2 0 0,1 2,-2z" />
+
+    <!-- Inner margin guideline -->
+    <path
+        android:strokeColor="#C8A24A"
+        android:strokeAlpha="0.4"
+        android:strokeWidth="0.8"
+        android:pathData="M36,36h36v36h-36z" />
+
+    <!-- Top scroll roller bar -->
+    <path
+        android:fillColor="#EBCD82"
+        android:pathData="M28,30h52a2,2 0 0,1 2,2a2,2 0 0,1 -2,2h-52a2,2 0 0,1 -2,-2a2,2 0 0,1 2,-2z" />
+    <path
+        android:fillColor="#C8A24A"
+        android:pathData="M25,32a2,2 0 1,0 0,0.1z M83,32a2,2 0 1,0 0,0.1z" />
+
+    <!-- Bottom scroll roller bar -->
+    <path
+        android:fillColor="#EBCD82"
+        android:pathData="M28,74h52a2,2 0 0,1 2,2a2,2 0 0,1 -2,2h-52a2,2 0 0,1 -2,-2a2,2 0 0,1 2,-2z" />
+    <path
+        android:fillColor="#C8A24A"
+        android:pathData="M25,76a2,2 0 1,0 0,0.1z M83,76a2,2 0 1,0 0,0.1z" />
+
+    <!-- Sacred danda / bookmark spine (from existing icon) -->
+    <path
+        android:fillColor="#C8A24A"
+        android:pathData="M52,28h4v52h-4z" />
+
+    <!-- Danda finial and bookmark ribbon point -->
+    <path
+        android:fillColor="#EBCD82"
+        android:pathData="M54,24l3,4h-6z M52,80h4l-2,4z" />
 </vector>

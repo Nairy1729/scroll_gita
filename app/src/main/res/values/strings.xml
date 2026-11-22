@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Scroll the Gita</string>
 
     <string name="loading">Opening a quiet place to read</string>
@@ -90,7 +90,7 @@
     <string name="search_idle_body">Type a Sanskrit word, English meaning, or verse reference like 2.47.</string>
     <string name="chapter_number">Chapter %1$d</string>
     <string name="traditional_count">Traditional count, edition-dependent: %1$d</string>
-    <string name="available_count">%1$d shlokas in this reading</string>
+    <string name="available_count" tools:ignore="PluralsCandidate">%1$d shlokas in this reading</string>
     <string name="none_available">No shlokas in this reading yet</string>
     <string name="opens_shloka">Opens %1$s</string>
     <string name="chapter_empty_title">This chapter is not in the reading yet</string>
@@ -133,7 +133,7 @@
     <string name="bg_style_devotion_aura">Devotion aura</string>
     <string name="bg_style_courage_dawn">Courage dawn</string>
     <string name="text_size">Text size</string>
-    <string name="text_size_value">%1$d percent</string>
+    <string name="text_size_value" tools:ignore="PluralsCandidate">%1$d percent</string>
     <string name="restart_onboarding">Review the introduction</string>
     <string name="restart_onboarding_support">Shows the opening pages again. Saved shlokas stay on this device.</string>
     <string name="about_title">About this reading</string>

@@ -64,8 +64,8 @@ fun ShlokaPage(
     onUnderstand: () -> Unit,
     onToggleBookmark: () -> Unit,
     onOpenMenu: () -> Unit,
-    onShare: () -> Unit = {},
     modifier: Modifier = Modifier,
+    onShare: () -> Unit = {},
 ) {
     var motionPaused by remember { mutableStateOf(false) }
     val reviewLabel = when (shloka.contentStatus) {
