@@ -92,9 +92,18 @@ fun ShlokaDetailsContent(
             title = stringResource(R.string.simple_meaning),
             body = shloka.simpleMeaning,
             note = stringResource(R.string.simple_meaning_note),
+            testTag = "detail_simple_meaning",
         )
-        DetailBlock(title = stringResource(R.string.reflection), body = shloka.reflectionPrompt)
-        DetailBlock(title = stringResource(R.string.source), body = shloka.sourceTitle + "\n" + shloka.sourceAttribution)
+        DetailBlock(
+            title = stringResource(R.string.reflection),
+            body = shloka.reflectionPrompt,
+            testTag = "detail_reflection",
+        )
+        DetailBlock(
+            title = stringResource(R.string.source),
+            body = shloka.sourceTitle + "\n" + shloka.sourceAttribution,
+            testTag = "detail_source",
+        )
         AttributionLine(shloka.editionTitle) { stringResource(R.string.edition_line, it) }
         AttributionLine(shloka.translator) { stringResource(R.string.translator_line, it) }
         AttributionLine(shloka.reviewer) { stringResource(R.string.reviewer_line, it) }
@@ -129,12 +138,19 @@ fun ShlokaDetailsContent(
 }
 
 @Composable
-private fun DetailBlock(title: String, body: String, note: String? = null) {
+private fun DetailBlock(
+    title: String,
+    body: String,
+    note: String? = null,
+    testTag: String? = null,
+) {
     Text(
         text = title,
         style = MaterialTheme.typography.labelLarge,
         color = LocalGitaPalette.current.verseLabel,
-        modifier = Modifier.padding(top = GitaSpacing.section),
+        modifier = Modifier
+            .padding(top = GitaSpacing.section)
+            .then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
     )
     if (note != null) {
         Text(

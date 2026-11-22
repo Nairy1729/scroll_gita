@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -108,7 +109,8 @@ private fun SavedRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onOpen)
-            .padding(horizontal = GitaSpacing.screenHorizontal, vertical = GitaSpacing.item),
+            .padding(horizontal = GitaSpacing.screenHorizontal, vertical = GitaSpacing.item)
+            .testTag("saved_shloka_row_${item.shloka.id}"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -125,7 +127,9 @@ private fun SavedRow(
         }
         TextButton(
             onClick = onRemove,
-            modifier = Modifier.heightIn(min = GitaSpacing.minTouch),
+            modifier = Modifier
+                .heightIn(min = GitaSpacing.minTouch)
+                .testTag("btn_remove_saved_${item.shloka.id}"),
         ) {
             Text(stringResource(R.string.remove_saved_cd, item.shloka.id))
         }

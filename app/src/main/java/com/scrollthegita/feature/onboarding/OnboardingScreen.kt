@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,6 +51,7 @@ fun OnboardingScreen(
             text = stringResource(R.string.onboarding_step, pagerState.currentPage + 1, 3),
             style = MaterialTheme.typography.labelLarge,
             color = LocalGitaPalette.current.verseLabel,
+            modifier = Modifier.testTag("onboarding_step_text"),
         )
         HorizontalPager(
             state = pagerState,
@@ -67,7 +69,9 @@ fun OnboardingScreen(
             if (pagerState.currentPage > 0) {
                 TextButton(
                     onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
-                    modifier = Modifier.heightIn(min = GitaSpacing.minTouch),
+                    modifier = Modifier
+                        .heightIn(min = GitaSpacing.minTouch)
+                        .testTag("onboarding_back_button"),
                 ) {
                     Text(stringResource(R.string.back))
                 }
@@ -80,7 +84,9 @@ fun OnboardingScreen(
                         viewModel.begin(onFinished)
                     }
                 },
-                modifier = Modifier.heightIn(min = GitaSpacing.minTouch),
+                modifier = Modifier
+                    .heightIn(min = GitaSpacing.minTouch)
+                    .testTag("onboarding_next_button"),
             ) {
                 Text(
                     if (pagerState.currentPage < 2) {
@@ -130,8 +136,18 @@ private fun DisplayPage(state: OnboardingUiState, viewModel: OnboardingViewModel
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(top = GitaSpacing.item, bottom = GitaSpacing.section),
         )
-        GitaSwitchRow(stringResource(R.string.show_sanskrit), state.showSanskrit, viewModel::setShowSanskrit)
-        GitaSwitchRow(stringResource(R.string.show_transliteration), state.showTransliteration, viewModel::setShowTransliteration)
+        GitaSwitchRow(
+            title = stringResource(R.string.show_sanskrit),
+            checked = state.showSanskrit,
+            onCheckedChange = viewModel::setShowSanskrit,
+            modifier = Modifier.testTag("switch_sanskrit"),
+        )
+        GitaSwitchRow(
+            title = stringResource(R.string.show_transliteration),
+            checked = state.showTransliteration,
+            onCheckedChange = viewModel::setShowTransliteration,
+            modifier = Modifier.testTag("switch_transliteration"),
+        )
         Text(
             text = stringResource(R.string.meaning_language),
             style = MaterialTheme.typography.labelLarge,
@@ -140,11 +156,13 @@ private fun DisplayPage(state: OnboardingUiState, viewModel: OnboardingViewModel
         GitaRadioRow(
             title = stringResource(R.string.language_english),
             selected = state.language == PreferredLanguage.ENGLISH,
+            modifier = Modifier.testTag("radio_language_english"),
             onClick = { viewModel.setLanguage(PreferredLanguage.ENGLISH) },
         )
         GitaRadioRow(
             title = stringResource(R.string.language_hindi),
             selected = state.language == PreferredLanguage.HINDI,
+            modifier = Modifier.testTag("radio_language_hindi"),
             onClick = { viewModel.setLanguage(PreferredLanguage.HINDI) },
         )
     }
@@ -167,12 +185,14 @@ private fun MotionPage(state: OnboardingUiState, viewModel: OnboardingViewModel)
         GitaRadioRow(
             title = stringResource(R.string.motion_gentle),
             selected = state.animationsEnabled,
+            modifier = Modifier.testTag("radio_motion_gentle"),
             onClick = { viewModel.setAnimationsEnabled(true) },
             support = stringResource(R.string.motion_gentle_support),
         )
         GitaRadioRow(
             title = stringResource(R.string.motion_still),
             selected = !state.animationsEnabled,
+            modifier = Modifier.testTag("radio_motion_still"),
             onClick = { viewModel.setAnimationsEnabled(false) },
             support = stringResource(R.string.motion_still_support),
         )

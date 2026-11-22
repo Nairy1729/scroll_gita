@@ -30,6 +30,7 @@ import com.scrollthegita.domain.repository.UserSettingsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
@@ -106,4 +107,11 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindClock(impl: AppClock): Clock
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface AppSettingsEntryPoint {
+    fun userSettingsRepository(): UserSettingsRepository
+    fun bookmarkDao(): BookmarkDao
 }

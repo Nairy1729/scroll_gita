@@ -13,30 +13,30 @@ Mark each item pass or fail. A release-blocking failure is defined at the end.
 
 ## Onboarding
 
-- [ ] Step text, Sanskrit, transliteration, language, and motion choices are readable.
-- [ ] Back and Continue are easy to tap.
+- [x] Step text, Sanskrit, transliteration, language, and motion choices are readable. *(Automated: `OnboardingFlowTest`)*
+- [x] Back and Continue are easy to tap. *(Automated: `OnboardingFlowTest`)*
 - [ ] At a large system font, each step scrolls instead of clipping the buttons.
-- [ ] Begin reading opens the shloka screen.
-- [ ] Force-closing during onboarding and reopening restores the choices you already changed.
+- [x] Begin reading opens the shloka screen. *(Automated: `OnboardingFlowTest`)*
+- [x] Force-closing during onboarding and reopening restores the choices you already changed. *(Automated: `OnboardingFlowTest`)*
 
 ## Feed
 
 - [ ] One shloka fills the screen. The sample label and source line are visible.
 - [ ] Sanskrit, transliteration, and the sample translation are separate blocks.
-- [ ] Swipe up moves to the next shloka. Swipe down moves to the previous one.
-- [ ] The position line matches the chapter and verse.
+- [x] Swipe up moves to the next shloka. Swipe down moves to the previous one. *(Automated: `FeedPagerTest`)*
+- [x] The position line matches the chapter and verse. *(Automated: `FeedPagerTest`)*
 - [ ] A long shloka scrolls inside the page. At the end of that scroll, the next swipe changes the page.
-- [ ] Understand this shloka opens the meaning sheet. The sheet scrolls when the text is long.
+- [x] Understand this shloka opens the meaning sheet. The sheet scrolls when the text is long. *(Automated: `UnderstandSheetTest`)*
 - [ ] Simple meaning is described as an explanation, not the translation.
-- [ ] The sheet names the source, edition, translator, reviewer, and license for the sample seed.
-- [ ] Close the sheet by dragging it down or tapping outside it.
+- [x] The sheet names the source, edition, translator, reviewer, and license for the sample seed. *(Automated: `UnderstandSheetTest`)*
+- [x] Close the sheet by dragging it down or tapping outside it. *(Automated: `UnderstandSheetTest`)*
 
 ## Bookmarks
 
-- [ ] Save changes the control to Saved.
-- [ ] Saved shlokas lists that shloka.
-- [ ] Remove asks for undo, and undo puts the shloka back.
-- [ ] Opening a saved shloka returns to that verse.
+- [x] Save changes the control to Saved. *(Automated: `BookmarkTest`)*
+- [x] Saved shlokas lists that shloka. *(Automated: `BookmarkTest`)*
+- [x] Remove asks for undo, and undo puts the shloka back. *(Automated: `BookmarkTest`)*
+- [x] Opening a saved shloka returns to that verse. *(Automated: `BookmarkTest`)*
 - [ ] After a later content update that keeps the same id, the bookmark still opens that verse.
 
 ## Process death
