@@ -4,6 +4,7 @@ import com.scrollthegita.core.model.BackgroundStyle
 import com.scrollthegita.core.model.Bookmark
 import com.scrollthegita.core.model.Chapter
 import com.scrollthegita.core.model.ContentStatus
+import com.scrollthegita.core.model.JourneyProgress
 import com.scrollthegita.core.model.SearchText
 import com.scrollthegita.core.model.Shloka
 import com.scrollthegita.core.model.ShlokaTheme
@@ -88,4 +89,16 @@ internal fun ChapterEntity.toDomain(): Chapter = Chapter(
 internal fun BookmarkEntity.toDomain(): Bookmark = Bookmark(
     shlokaId = shlokaId,
     createdAtEpochMillis = createdAtEpochMillis,
+)
+
+internal fun JourneyProgress.toEntity(): JourneyProgressEntity = JourneyProgressEntity(
+    journeyId = journeyId,
+    currentIndex = currentIndex,
+    lastReadAtEpochMillis = lastReadAtEpochMillis,
+)
+
+internal fun JourneyProgressEntity.toDomain(): JourneyProgress = JourneyProgress(
+    journeyId = journeyId,
+    currentIndex = currentIndex,
+    lastReadAtEpochMillis = lastReadAtEpochMillis,
 )

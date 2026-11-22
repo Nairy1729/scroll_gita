@@ -146,3 +146,21 @@ interface SearchDao {
     @Query("SELECT * FROM chapters")
     suspend fun chapters(): List<ChapterEntity>
 }
+
+@Dao
+interface JourneyProgressDao {
+    @Query("SELECT * FROM journey_progress")
+    fun observeAll(): Flow<List<JourneyProgressEntity>>
+
+    @Query("SELECT * FROM journey_progress WHERE journeyId = :journeyId")
+    fun observe(journeyId: String): Flow<JourneyProgressEntity?>
+
+    @Query("SELECT * FROM journey_progress WHERE journeyId = :journeyId")
+    suspend fun find(journeyId: String): JourneyProgressEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun save(entity: JourneyProgressEntity)
+
+    @Query("DELETE FROM journey_progress WHERE journeyId = :journeyId")
+    suspend fun delete(journeyId: String)
+}

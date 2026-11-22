@@ -104,4 +104,22 @@ object GitaMigrations {
             db.execSQL("INSERT INTO `shlokas_fts`(`shlokas_fts`) VALUES('rebuild')")
         }
     }
+
+    /**
+     * Version 5 adds journey_progress table to record offline progress through curated reading journeys.
+     */
+    val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `journey_progress` (
+                  `journeyId` TEXT NOT NULL,
+                  `currentIndex` INTEGER NOT NULL,
+                  `lastReadAtEpochMillis` INTEGER NOT NULL,
+                  PRIMARY KEY(`journeyId`)
+                )
+                """.trimIndent(),
+            )
+        }
+    }
 }

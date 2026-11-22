@@ -2,6 +2,8 @@ package com.scrollthegita.domain.repository
 
 import com.scrollthegita.core.model.Bookmark
 import com.scrollthegita.core.model.Chapter
+import com.scrollthegita.core.model.Journey
+import com.scrollthegita.core.model.JourneyProgress
 import com.scrollthegita.core.model.OnboardingDraft
 import com.scrollthegita.core.model.PersonalReflection
 import com.scrollthegita.core.model.ReadingHistory
@@ -54,4 +56,12 @@ interface ReflectionRepository {
     fun observe(shlokaId: String): Flow<PersonalReflection?>
     suspend fun save(shlokaId: String, body: String, nowEpochMillis: Long)
     suspend fun delete(shlokaId: String)
+}
+
+interface JourneyRepository {
+    fun observeJourneys(): Flow<List<Journey>>
+    fun observeAllProgress(): Flow<List<JourneyProgress>>
+    fun observeProgress(journeyId: String): Flow<JourneyProgress?>
+    suspend fun saveProgress(journeyId: String, currentIndex: Int)
+    suspend fun getJourney(journeyId: String): Journey?
 }

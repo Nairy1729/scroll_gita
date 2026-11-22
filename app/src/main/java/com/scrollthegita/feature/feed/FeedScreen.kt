@@ -1,22 +1,27 @@
 package com.scrollthegita.feature.feed
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -33,11 +38,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scrollthegita.R
 import com.scrollthegita.core.design.CalmMessage
 import com.scrollthegita.core.design.GitaSpacing
+import com.scrollthegita.core.design.LocalGitaPalette
+import com.scrollthegita.core.model.Journey
 import com.scrollthegita.core.model.Shloka
 import com.scrollthegita.feature.details.ShlokaDetailsSheet
 import com.scrollthegita.feature.share.ShlokaCardRenderer
@@ -51,6 +59,8 @@ fun FeedRoute(
     onOpenChapters: () -> Unit,
     onOpenLibrary: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenJourneys: () -> Unit = {},
+    onExitJourney: (String) -> Unit = {},
     viewModel: FeedViewModel = hiltViewModel(),
     navigator: ReadingNavigator = activityReadingNavigator(),
 ) {
@@ -72,8 +82,10 @@ fun FeedRoute(
         onOpenDetails = viewModel::openDetails,
         onDismissDetails = viewModel::dismissDetails,
         onOpenChapters = onOpenChapters,
+        onOpenJourneys = onOpenJourneys,
         onOpenLibrary = onOpenLibrary,
         onOpenSettings = onOpenSettings,
+        onExitJourney = onExitJourney,
         onShareShloka = { shloka ->
             (state as? FeedUiState.Content)?.let { content ->
                 ShlokaCardRenderer.shareShloka(
@@ -98,8 +110,10 @@ fun FeedScreen(
     onOpenDetails: () -> Unit,
     onDismissDetails: () -> Unit,
     onOpenChapters: () -> Unit,
+    onOpenJourneys: () -> Unit = {},
     onOpenLibrary: () -> Unit,
     onOpenSettings: () -> Unit,
+    onExitJourney: (String) -> Unit = {},
     onShareShloka: (Shloka) -> Unit = {},
 ) {
     when (val current = state) {
@@ -126,8 +140,10 @@ fun FeedScreen(
             onOpenDetails = onOpenDetails,
             onDismissDetails = onDismissDetails,
             onOpenChapters = onOpenChapters,
+            onOpenJourneys = onOpenJourneys,
             onOpenLibrary = onOpenLibrary,
             onOpenSettings = onOpenSettings,
+            onExitJourney = onExitJourney,
             onShareShloka = onShareShloka,
         )
     }
@@ -158,8 +174,10 @@ private fun FeedPager(
     onOpenDetails: () -> Unit,
     onDismissDetails: () -> Unit,
     onOpenChapters: () -> Unit,
+    onOpenJourneys: () -> Unit,
     onOpenLibrary: () -> Unit,
     onOpenSettings: () -> Unit,
+    onExitJourney: (String) -> Unit,
     onShareShloka: (Shloka) -> Unit,
 ) {
     val pagerState = rememberPagerState(
@@ -188,31 +206,46 @@ private fun FeedPager(
             onPageSettled(index, true)
         }
     }
-    VerticalPager(
-        state = pagerState,
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag("feed_pager"),
-        beyondViewportPageCount = 1,
-        key = { page -> content.shlokas[page].id },
-    ) { page ->
-        val shloka = content.shlokas[page]
-        ShlokaPage(
-            shloka = shloka,
-            preferences = content.preferences,
-            isPageActive = pagerState.currentPage == page && !pagerState.isScrollInProgress,
-            bookmarked = shloka.id in content.bookmarkedIds,
-            chromeVisible = chromeVisible,
-            bookmarkNote = if (pagerState.currentPage == page) content.bookmarkNote else null,
-            onToggleChrome = { chromeVisible = !chromeVisible },
-            onUnderstand = onOpenDetails,
-            onToggleBookmark = onToggleBookmark,
-            onShare = { onShareShloka(shloka) },
-            onOpenMenu = {
-                onDismissDetails()
-                menuOpen = true
-            },
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        VerticalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("feed_pager"),
+            beyondViewportPageCount = 1,
+            key = { page -> content.shlokas[page].id },
+        ) { page ->
+            val shloka = content.shlokas[page]
+            ShlokaPage(
+                shloka = shloka,
+                preferences = content.preferences,
+                isPageActive = pagerState.currentPage == page && !pagerState.isScrollInProgress,
+                bookmarked = shloka.id in content.bookmarkedIds,
+                chromeVisible = chromeVisible,
+                bookmarkNote = if (pagerState.currentPage == page) content.bookmarkNote else null,
+                onToggleChrome = { chromeVisible = !chromeVisible },
+                onUnderstand = onOpenDetails,
+                onToggleBookmark = onToggleBookmark,
+                onShare = { onShareShloka(shloka) },
+                onOpenMenu = {
+                    onDismissDetails()
+                    menuOpen = true
+                },
+            )
+        }
+
+        if (content.activeJourney != null && chromeVisible) {
+            JourneyHeader(
+                journey = content.activeJourney,
+                currentPage = pagerState.currentPage,
+                totalCount = content.shlokas.size,
+                onExit = {
+                    val currentShloka = content.shlokas.getOrNull(pagerState.currentPage)
+                    onExitJourney(currentShloka?.id.orEmpty())
+                },
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
+        }
     }
     content.details?.let { shloka ->
         ShlokaDetailsSheet(
@@ -255,6 +288,10 @@ private fun FeedPager(
                 menuOpen = false
                 onOpenChapters()
             },
+            onJourneys = {
+                menuOpen = false
+                onOpenJourneys()
+            },
             onSaved = {
                 menuOpen = false
                 onOpenLibrary()
@@ -263,7 +300,75 @@ private fun FeedPager(
                 menuOpen = false
                 onOpenSettings()
             },
+            isInsideJourney = content.activeJourney != null,
+            onExitJourney = {
+                menuOpen = false
+                val currentShloka = content.shlokas.getOrNull(pagerState.currentPage)
+                onExitJourney(currentShloka?.id.orEmpty())
+            },
         )
+    }
+}
+
+@Composable
+private fun JourneyHeader(
+    journey: Journey,
+    currentPage: Int,
+    totalCount: Int,
+    onExit: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val palette = LocalGitaPalette.current
+    val isLast = currentPage >= totalCount - 1
+    Surface(
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("journey_header"),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
+                .padding(horizontal = GitaSpacing.screenHorizontal, vertical = 4.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.journey_indicator, journey.title, currentPage + 1, totalCount),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = palette.verseLabel,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("journey_indicator"),
+                )
+                TextButton(
+                    onClick = onExit,
+                    modifier = Modifier
+                        .heightIn(min = GitaSpacing.minTouch)
+                        .testTag("btn_exit_journey"),
+                ) {
+                    Text(
+                        text = stringResource(R.string.exit_journey),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+            if (isLast) {
+                Text(
+                    text = stringResource(R.string.journey_completed_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = palette.verseLabel,
+                    modifier = Modifier
+                        .padding(bottom = 6.dp)
+                        .testTag("journey_completed_note"),
+                )
+            }
+        }
     }
 }
 
@@ -272,8 +377,11 @@ private fun FeedPager(
 private fun ReadingMenuSheet(
     onDismiss: () -> Unit,
     onChapters: () -> Unit,
+    onJourneys: () -> Unit,
     onSaved: () -> Unit,
     onSettings: () -> Unit,
+    isInsideJourney: Boolean,
+    onExitJourney: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
@@ -292,8 +400,12 @@ private fun ReadingMenuSheet(
                 style = MaterialTheme.typography.titleMedium,
             )
             MenuAction(stringResource(R.string.menu_chapters), onChapters, modifier = Modifier.testTag("menu_chapters"))
+            MenuAction(stringResource(R.string.menu_journeys), onJourneys, modifier = Modifier.testTag("menu_journeys"))
             MenuAction(stringResource(R.string.menu_saved), onSaved, modifier = Modifier.testTag("menu_saved"))
             MenuAction(stringResource(R.string.menu_settings), onSettings, modifier = Modifier.testTag("menu_settings"))
+            if (isInsideJourney) {
+                MenuAction(stringResource(R.string.exit_journey), onExitJourney, modifier = Modifier.testTag("menu_exit_journey"))
+            }
         }
     }
 }

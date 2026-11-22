@@ -13,16 +13,19 @@ import com.scrollthegita.core.database.ChapterDao
 import com.scrollthegita.core.database.GitaDatabase
 import com.scrollthegita.core.database.GitaMigrations
 import com.scrollthegita.core.database.GitaPrivateDatabase
+import com.scrollthegita.core.database.JourneyProgressDao
 import com.scrollthegita.core.database.ReadingHistoryDao
 import com.scrollthegita.core.database.ReflectionDao
 import com.scrollthegita.core.database.SearchDao
 import com.scrollthegita.core.database.ShlokaDao
 import com.scrollthegita.data.repository.GitaContentRepositoryImpl
+import com.scrollthegita.data.repository.JourneyRepositoryImpl
 import com.scrollthegita.data.repository.ReadingHistoryRepositoryImpl
 import com.scrollthegita.data.repository.ReflectionRepositoryImpl
 import com.scrollthegita.data.repository.SearchRepositoryImpl
 import com.scrollthegita.data.repository.UserSettingsRepositoryImpl
 import com.scrollthegita.domain.repository.GitaContentRepository
+import com.scrollthegita.domain.repository.JourneyRepository
 import com.scrollthegita.domain.repository.ReadingHistoryRepository
 import com.scrollthegita.domain.repository.ReflectionRepository
 import com.scrollthegita.domain.repository.SearchRepository
@@ -47,6 +50,7 @@ object DatabaseModule {
                 GitaMigrations.MIGRATION_1_2,
                 GitaMigrations.MIGRATION_2_3,
                 GitaMigrations.MIGRATION_3_4,
+                GitaMigrations.MIGRATION_4_5,
             )
             .build()
 
@@ -73,6 +77,9 @@ object DatabaseModule {
 
     @Provides
     fun provideReflectionDao(database: GitaPrivateDatabase): ReflectionDao = database.reflectionDao()
+
+    @Provides
+    fun provideJourneyProgressDao(database: GitaDatabase): JourneyProgressDao = database.journeyProgressDao()
 }
 
 @Module
@@ -92,6 +99,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindContent(impl: GitaContentRepositoryImpl): GitaContentRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindJourney(impl: JourneyRepositoryImpl): JourneyRepository
 
     @Binds
     @Singleton

@@ -92,3 +92,10 @@ data class ReadingHistoryEntity(
     val lastReadAtEpochMillis: Long,
     val settledReadCount: Int,
 )
+
+@Entity(tableName = "journey_progress")
+data class JourneyProgressEntity(
+    @PrimaryKey val journeyId: String,
+    val currentIndex: Int,
+    val lastReadAtEpochMillis: Long,
+)

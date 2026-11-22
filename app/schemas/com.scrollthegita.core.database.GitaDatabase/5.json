@@ -1,0 +1,449 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "9a0b538e5c2033bf8fc389dd02f9cc4a",
+    "entities": [
+      {
+        "tableName": "shlokas",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `chapter` INTEGER NOT NULL, `verse` INTEGER NOT NULL, `sanskrit` TEXT NOT NULL, `transliteration` TEXT NOT NULL, `translationEnglish` TEXT NOT NULL, `translationHindi` TEXT, `simpleMeaning` TEXT NOT NULL, `reflectionPrompt` TEXT NOT NULL, `themes` TEXT NOT NULL, `backgroundStyle` TEXT NOT NULL, `sourceTitle` TEXT NOT NULL, `sourceAttribution` TEXT NOT NULL, `sortOrder` INTEGER NOT NULL, `contentStatus` TEXT NOT NULL, `editionTitle` TEXT NOT NULL DEFAULT '', `translator` TEXT NOT NULL DEFAULT '', `reviewer` TEXT NOT NULL DEFAULT '', `licenseStatement` TEXT NOT NULL DEFAULT '', `sourceReference` TEXT NOT NULL DEFAULT '', `contentVersion` TEXT NOT NULL DEFAULT '', `searchSanskrit` TEXT NOT NULL DEFAULT '', `searchTransliteration` TEXT NOT NULL DEFAULT '', `searchEnglish` TEXT NOT NULL DEFAULT '', `searchHindi` TEXT NOT NULL DEFAULT '', `searchMeaning` TEXT NOT NULL DEFAULT '', `searchThemes` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chapter",
+            "columnName": "chapter",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verse",
+            "columnName": "verse",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sanskrit",
+            "columnName": "sanskrit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transliteration",
+            "columnName": "transliteration",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "translationEnglish",
+            "columnName": "translationEnglish",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "translationHindi",
+            "columnName": "translationHindi",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "simpleMeaning",
+            "columnName": "simpleMeaning",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reflectionPrompt",
+            "columnName": "reflectionPrompt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "themes",
+            "columnName": "themes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "backgroundStyle",
+            "columnName": "backgroundStyle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceTitle",
+            "columnName": "sourceTitle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceAttribution",
+            "columnName": "sourceAttribution",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contentStatus",
+            "columnName": "contentStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "editionTitle",
+            "columnName": "editionTitle",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "translator",
+            "columnName": "translator",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "reviewer",
+            "columnName": "reviewer",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "licenseStatement",
+            "columnName": "licenseStatement",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "sourceReference",
+            "columnName": "sourceReference",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "contentVersion",
+            "columnName": "contentVersion",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchSanskrit",
+            "columnName": "searchSanskrit",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchTransliteration",
+            "columnName": "searchTransliteration",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchEnglish",
+            "columnName": "searchEnglish",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchHindi",
+            "columnName": "searchHindi",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchMeaning",
+            "columnName": "searchMeaning",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchThemes",
+            "columnName": "searchThemes",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_shlokas_searchTransliteration",
+            "unique": false,
+            "columnNames": [
+              "searchTransliteration"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shlokas_searchTransliteration` ON `${TABLE_NAME}` (`searchTransliteration`)"
+          }
+        ]
+      },
+      {
+        "tableName": "chapters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `nameSanskrit` TEXT NOT NULL, `nameEnglish` TEXT NOT NULL, `summary` TEXT NOT NULL, `totalShlokas` INTEGER NOT NULL, `isContentComplete` INTEGER NOT NULL DEFAULT 0, `searchSanskrit` TEXT NOT NULL DEFAULT '', `searchEnglish` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`number`))",
+        "fields": [
+          {
+            "fieldPath": "number",
+            "columnName": "number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameSanskrit",
+            "columnName": "nameSanskrit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameEnglish",
+            "columnName": "nameEnglish",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "summary",
+            "columnName": "summary",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalShlokas",
+            "columnName": "totalShlokas",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isContentComplete",
+            "columnName": "isContentComplete",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "searchSanskrit",
+            "columnName": "searchSanskrit",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchEnglish",
+            "columnName": "searchEnglish",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "number"
+          ]
+        }
+      },
+      {
+        "tableName": "bookmarks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shlokaId` TEXT NOT NULL, `createdAtEpochMillis` INTEGER NOT NULL, PRIMARY KEY(`shlokaId`), FOREIGN KEY(`shlokaId`) REFERENCES `shlokas`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "shlokaId",
+            "columnName": "shlokaId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtEpochMillis",
+            "columnName": "createdAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "shlokaId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_bookmarks_shlokaId",
+            "unique": false,
+            "columnNames": [
+              "shlokaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_bookmarks_shlokaId` ON `${TABLE_NAME}` (`shlokaId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "shlokas",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "shlokaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "reading_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shlokaId` TEXT NOT NULL, `chapter` INTEGER NOT NULL, `verse` INTEGER NOT NULL, `firstReadAtEpochMillis` INTEGER NOT NULL, `lastReadAtEpochMillis` INTEGER NOT NULL, `settledReadCount` INTEGER NOT NULL, PRIMARY KEY(`shlokaId`))",
+        "fields": [
+          {
+            "fieldPath": "shlokaId",
+            "columnName": "shlokaId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chapter",
+            "columnName": "chapter",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verse",
+            "columnName": "verse",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "firstReadAtEpochMillis",
+            "columnName": "firstReadAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastReadAtEpochMillis",
+            "columnName": "lastReadAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "settledReadCount",
+            "columnName": "settledReadCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "shlokaId"
+          ]
+        }
+      },
+      {
+        "tableName": "shlokas_fts",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`sanskrit` TEXT NOT NULL, `transliteration` TEXT NOT NULL, `translationEnglish` TEXT NOT NULL, `simpleMeaning` TEXT NOT NULL, content=`shlokas`)",
+        "fields": [
+          {
+            "fieldPath": "sanskrit",
+            "columnName": "sanskrit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transliteration",
+            "columnName": "transliteration",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "translation",
+            "columnName": "translationEnglish",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "simpleMeaning",
+            "columnName": "simpleMeaning",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "ftsVersion": "FTS4",
+        "ftsOptions": {
+          "tokenizer": "simple",
+          "tokenizerArgs": [],
+          "contentTable": "shlokas",
+          "languageIdColumnName": "",
+          "matchInfo": "FTS4",
+          "notIndexedColumns": [],
+          "prefixSizes": [],
+          "preferredOrder": "ASC"
+        },
+        "contentSyncTriggers": [
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_BEFORE_UPDATE BEFORE UPDATE ON `shlokas` BEGIN DELETE FROM `shlokas_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_BEFORE_DELETE BEFORE DELETE ON `shlokas` BEGIN DELETE FROM `shlokas_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_AFTER_UPDATE AFTER UPDATE ON `shlokas` BEGIN INSERT INTO `shlokas_fts`(`docid`, `sanskrit`, `transliteration`, `translationEnglish`, `simpleMeaning`) VALUES (NEW.`rowid`, NEW.`sanskrit`, NEW.`transliteration`, NEW.`translationEnglish`, NEW.`simpleMeaning`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_shlokas_fts_AFTER_INSERT AFTER INSERT ON `shlokas` BEGIN INSERT INTO `shlokas_fts`(`docid`, `sanskrit`, `transliteration`, `translationEnglish`, `simpleMeaning`) VALUES (NEW.`rowid`, NEW.`sanskrit`, NEW.`transliteration`, NEW.`translationEnglish`, NEW.`simpleMeaning`); END"
+        ]
+      },
+      {
+        "tableName": "journey_progress",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`journeyId` TEXT NOT NULL, `currentIndex` INTEGER NOT NULL, `lastReadAtEpochMillis` INTEGER NOT NULL, PRIMARY KEY(`journeyId`))",
+        "fields": [
+          {
+            "fieldPath": "journeyId",
+            "columnName": "journeyId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentIndex",
+            "columnName": "currentIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastReadAtEpochMillis",
+            "columnName": "lastReadAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "journeyId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9a0b538e5c2033bf8fc389dd02f9cc4a')"
+    ]
+  }
+}

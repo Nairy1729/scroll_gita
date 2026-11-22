@@ -127,3 +127,16 @@ data class OnboardingDraft(
     val preferredLanguage: PreferredLanguage,
     val animationsEnabled: Boolean,
 )
+
+data class Journey(
+    val id: String,
+    val title: String,
+    val description: String,
+    val shlokas: List<String>,
+)
+
+data class JourneyProgress(
+    val journeyId: String,
+    val currentIndex: Int,
+    val lastReadAtEpochMillis: Long,
+)

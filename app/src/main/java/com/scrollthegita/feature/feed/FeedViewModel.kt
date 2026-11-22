@@ -2,13 +2,20 @@ package com.scrollthegita.feature.feed
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.scrollthegita.core.common.Clock
 import com.scrollthegita.core.common.UserFacingError
+import com.scrollthegita.core.model.BackgroundStyle
 import com.scrollthegita.core.model.Bookmark
+import com.scrollthegita.core.model.ContentStatus
+import com.scrollthegita.core.model.Journey
 import com.scrollthegita.core.model.ReadingPolicy
 import com.scrollthegita.core.model.ReadingProgress
 import com.scrollthegita.core.model.Shloka
+import com.scrollthegita.core.model.ShlokaTheme
 import com.scrollthegita.core.model.UserPreferences
+import com.scrollthegita.core.navigation.Routes
+import com.scrollthegita.domain.repository.JourneyRepository
 import com.scrollthegita.domain.usecase.ObserveBookmarksUseCase
 import com.scrollthegita.domain.usecase.ObserveReadingProgressUseCase
 import com.scrollthegita.domain.usecase.ObserveShlokasUseCase
@@ -28,7 +35,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewModelScope
 
 enum class BookmarkNote { Saved, Removed }
 
@@ -41,6 +47,7 @@ sealed interface FeedUiState {
         val preferences: UserPreferences,
         val details: Shloka?,
         val bookmarkNote: BookmarkNote?,
+        val activeJourney: Journey? = null,
     ) : FeedUiState
     data object Empty : FeedUiState
     data class Error(val error: UserFacingError) : FeedUiState
@@ -57,6 +64,7 @@ class FeedViewModel @Inject constructor(
     private val recordSettledRead: RecordSettledReadUseCase,
     private val clock: Clock,
     private val savedStateHandle: SavedStateHandle,
+    private val journeyRepository: JourneyRepository,
 ) : ViewModel() {
     private val detailsOpen = savedStateHandle.getStateFlow(KEY_DETAILS_OPEN, false)
     private val bookmarkNote = MutableStateFlow<BookmarkNote?>(null)
@@ -68,12 +76,18 @@ class FeedViewModel @Inject constructor(
     private val _pause = MutableStateFlow(false)
     val pause: StateFlow<Boolean> = _pause.asStateFlow()
     private var shlokas: List<Shloka> = emptyList()
+    private var activeJourney: Journey? = null
 
     private val _state = MutableStateFlow<FeedUiState>(FeedUiState.Loading)
     val state: StateFlow<FeedUiState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
+            val journeyId = savedStateHandle.get<String>(Routes.JOURNEY_ID_ARG)?.ifBlank { null }
+            if (journeyId != null) {
+                activeJourney = journeyRepository.getJourney(journeyId)
+            }
+
             combine(
                 observeShlokas(),
                 observeBookmarks(),
@@ -85,24 +99,39 @@ class FeedViewModel @Inject constructor(
             }.catch {
                 _state.value = FeedUiState.Error(UserFacingError.ContentUnavailable)
             }.collect { snapshot ->
-                shlokas = snapshot.shlokas
-                if (snapshot.shlokas.isEmpty()) {
+                val journey = activeJourney
+                val displayedShlokas = if (journey != null) {
+                    journey.shlokas.map { ref ->
+                        snapshot.shlokas.find { it.id == ref } ?: createPlaceholderShloka(ref)
+                    }
+                } else {
+                    snapshot.shlokas
+                }
+                shlokas = displayedShlokas
+
+                if (displayedShlokas.isEmpty()) {
                     _state.value = FeedUiState.Empty
                     return@collect
                 }
                 if (resumeIndex < 0) {
-                    val progress = observeProgress().first()
-                    resumeIndex = indexOf(snapshot.shlokas, progress?.lastShlokaId)
+                    if (journey != null) {
+                        val journeyProgress = journeyRepository.observeProgress(journey.id).first()
+                        resumeIndex = journeyProgress?.currentIndex?.coerceIn(0, displayedShlokas.lastIndex) ?: 0
+                    } else {
+                        val progress = observeProgress().first()
+                        resumeIndex = indexOf(displayedShlokas, progress?.lastShlokaId)
+                    }
                     currentIndex.value = resumeIndex
                 }
-                val page = currentIndex.value.coerceIn(0, snapshot.shlokas.lastIndex)
+                val page = currentIndex.value.coerceIn(0, displayedShlokas.lastIndex)
                 _state.value = FeedUiState.Content(
-                    shlokas = snapshot.shlokas,
-                    resumeIndex = resumeIndex.coerceIn(0, snapshot.shlokas.lastIndex),
+                    shlokas = displayedShlokas,
+                    resumeIndex = resumeIndex.coerceIn(0, displayedShlokas.lastIndex),
                     bookmarkedIds = snapshot.bookmarks.map { it.shlokaId }.toSet(),
                     preferences = snapshot.preferences,
-                    details = if (snapshot.detailsOpen) snapshot.shlokas.getOrNull(page) else null,
+                    details = if (snapshot.detailsOpen) displayedShlokas.getOrNull(page) else null,
                     bookmarkNote = snapshot.note,
+                    activeJourney = journey,
                 )
             }
         }
@@ -111,11 +140,12 @@ class FeedViewModel @Inject constructor(
     fun onPageSettled(index: Int, fromJump: Boolean = false) {
         if (index !in shlokas.indices) return
         currentIndex.value = index
-        // Keep this off the emitted state. Publishing it would recompose every page on each swipe.
-        // The pager saves its own page, and reading progress is what cold start restores.
         resumeIndex = index
         val shloka = shlokas[index]
         viewModelScope.launch {
+            activeJourney?.let { journey ->
+                journeyRepository.saveProgress(journey.id, index)
+            }
             saveProgress(
                 ReadingProgress(
                     lastShlokaId = shloka.id,
@@ -154,7 +184,6 @@ class FeedViewModel @Inject constructor(
             val note = if (nowSaved) BookmarkNote.Saved else BookmarkNote.Removed
             bookmarkNote.value = note
             delay(1_600)
-            // A later toggle must keep its own confirmation.
             bookmarkNote.update { current -> if (current == note) null else current }
         }
     }
@@ -170,6 +199,29 @@ class FeedViewModel @Inject constructor(
     private fun indexOf(pages: List<Shloka>, id: String?): Int {
         val found = pages.indexOfFirst { it.id == id }
         return if (found < 0) 0 else found
+    }
+
+    private fun createPlaceholderShloka(ref: String): Shloka {
+        val parts = ref.split(".")
+        val ch = parts.getOrNull(0)?.toIntOrNull() ?: 1
+        val v = parts.getOrNull(1)?.toIntOrNull() ?: 1
+        return Shloka(
+            id = ref,
+            chapter = ch,
+            verse = v,
+            sanskrit = "श्रीमद्भगवद्गीता $ch.$v",
+            transliteration = "Bhagavad Gita $ch.$v",
+            translationEnglish = "Reading journey selection for verse $ch.$v.",
+            translationHindi = null,
+            simpleMeaning = "Focus on the contemplation of verse $ch.$v in this curated sequence.",
+            reflectionPrompt = "How does this teaching reflect in your life today?",
+            themes = listOf(ShlokaTheme.DUTY),
+            backgroundStyle = BackgroundStyle.KARMA_SUNRISE,
+            sourceTitle = "Scroll the Gita Curated Journey",
+            sourceAttribution = "Offline Curated Selection",
+            sortOrder = ch * 1000 + v,
+            contentStatus = ContentStatus.SAMPLE,
+        )
     }
 
     private data class Snapshot(

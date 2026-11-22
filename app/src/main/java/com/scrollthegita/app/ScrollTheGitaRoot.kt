@@ -40,6 +40,7 @@ import com.scrollthegita.domain.usecase.ObserveUserPreferencesUseCase
 import com.scrollthegita.feature.chapters.ChaptersScreen
 import com.scrollthegita.feature.feed.FeedRoute
 import com.scrollthegita.feature.feed.activityReadingNavigator
+import com.scrollthegita.feature.journeys.JourneysScreen
 import com.scrollthegita.feature.library.LibraryScreen
 import com.scrollthegita.feature.onboarding.OnboardingScreen
 import com.scrollthegita.feature.search.SearchScreen
@@ -167,13 +168,32 @@ fun GitaNavHost(startDestination: String) {
                     type = NavType.StringType
                     defaultValue = ""
                 },
+                navArgument(Routes.JOURNEY_ID_ARG) {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
             ),
         ) { entry ->
             FeedRoute(
                 requestedShlokaId = entry.arguments?.getString(Routes.SHLOKA_ARG).orEmpty(),
                 onOpenChapters = { navController.navigate(Routes.CHAPTERS) },
+                onOpenJourneys = { navController.navigate(Routes.JOURNEYS) },
                 onOpenLibrary = { navController.navigate(Routes.LIBRARY) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onExitJourney = { id ->
+                    if (id.isNotBlank()) navigator.open(id)
+                    navController.navigate(Routes.feed(shlokaId = id)) {
+                        popUpTo(Routes.FEED) { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable(Routes.JOURNEYS) {
+            JourneysScreen(
+                onBack = { navController.popBackStack() },
+                onOpenJourney = { journeyId ->
+                    navController.navigate(Routes.feed(journeyId = journeyId))
+                },
             )
         }
         composable(Routes.CHAPTERS) {

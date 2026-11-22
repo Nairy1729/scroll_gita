@@ -10,8 +10,9 @@ import androidx.room.RoomDatabase
         BookmarkEntity::class,
         ReadingHistoryEntity::class,
         ShlokaFts::class,
+        JourneyProgressEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class GitaDatabase : RoomDatabase() {
@@ -20,4 +21,5 @@ abstract class GitaDatabase : RoomDatabase() {
     abstract fun bookmarkDao(): BookmarkDao
     abstract fun readingHistoryDao(): ReadingHistoryDao
     abstract fun searchDao(): SearchDao
+    abstract fun journeyProgressDao(): JourneyProgressDao
 }

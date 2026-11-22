@@ -106,6 +106,7 @@ class GitaMigrationTest {
                 GitaMigrations.MIGRATION_1_2,
                 GitaMigrations.MIGRATION_2_3,
                 GitaMigrations.MIGRATION_3_4,
+                GitaMigrations.MIGRATION_4_5,
             )
             .allowMainThreadQueries()
             .build()
@@ -225,7 +226,7 @@ class GitaMigrationTest {
         }
 
         val migratedDb = Room.databaseBuilder(context, GitaDatabase::class.java, name)
-            .addMigrations(GitaMigrations.MIGRATION_3_4)
+            .addMigrations(GitaMigrations.MIGRATION_3_4, GitaMigrations.MIGRATION_4_5)
             .allowMainThreadQueries()
             .build()
 
@@ -251,6 +252,150 @@ class GitaMigrationTest {
         val meaningResults = migratedDb.searchDao().searchFts("action*")
         assertEquals(1, meaningResults.size)
         assertEquals("2.47", meaningResults.first().id)
+
+        migratedDb.close()
+    }
+
+    @Test
+    fun migration4To5CreatesJourneyProgressAndPreservesData() = runBlocking {
+        context.openOrCreateDatabase(name, Context.MODE_PRIVATE, null).use { db ->
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `shlokas` (
+                  `id` TEXT NOT NULL,
+                  `chapter` INTEGER NOT NULL,
+                  `verse` INTEGER NOT NULL,
+                  `sanskrit` TEXT NOT NULL,
+                  `transliteration` TEXT NOT NULL,
+                  `translationEnglish` TEXT NOT NULL,
+                  `translationHindi` TEXT,
+                  `simpleMeaning` TEXT NOT NULL,
+                  `reflectionPrompt` TEXT NOT NULL,
+                  `themes` TEXT NOT NULL,
+                  `backgroundStyle` TEXT NOT NULL,
+                  `sourceTitle` TEXT NOT NULL,
+                  `sourceAttribution` TEXT NOT NULL,
+                  `sortOrder` INTEGER NOT NULL,
+                  `contentStatus` TEXT NOT NULL,
+                  `editionTitle` TEXT NOT NULL DEFAULT '',
+                  `translator` TEXT NOT NULL DEFAULT '',
+                  `reviewer` TEXT NOT NULL DEFAULT '',
+                  `licenseStatement` TEXT NOT NULL DEFAULT '',
+                  `sourceReference` TEXT NOT NULL DEFAULT '',
+                  `contentVersion` TEXT NOT NULL DEFAULT '',
+                  `searchSanskrit` TEXT NOT NULL DEFAULT '',
+                  `searchTransliteration` TEXT NOT NULL DEFAULT '',
+                  `searchEnglish` TEXT NOT NULL DEFAULT '',
+                  `searchHindi` TEXT NOT NULL DEFAULT '',
+                  `searchMeaning` TEXT NOT NULL DEFAULT '',
+                  `searchThemes` TEXT NOT NULL DEFAULT '',
+                  PRIMARY KEY(`id`)
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `chapters` (
+                  `number` INTEGER NOT NULL,
+                  `nameSanskrit` TEXT NOT NULL,
+                  `nameEnglish` TEXT NOT NULL,
+                  `summary` TEXT NOT NULL,
+                  `totalShlokas` INTEGER NOT NULL,
+                  `isContentComplete` INTEGER NOT NULL DEFAULT 0,
+                  `searchSanskrit` TEXT NOT NULL DEFAULT '',
+                  `searchEnglish` TEXT NOT NULL DEFAULT '',
+                  PRIMARY KEY(`number`)
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `bookmarks` (
+                  `shlokaId` TEXT NOT NULL,
+                  `createdAtEpochMillis` INTEGER NOT NULL,
+                  PRIMARY KEY(`shlokaId`),
+                  FOREIGN KEY(`shlokaId`) REFERENCES `shlokas`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                )
+                """.trimIndent(),
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_bookmarks_shlokaId` ON `bookmarks` (`shlokaId`)")
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `reading_history` (
+                  `shlokaId` TEXT NOT NULL,
+                  `chapter` INTEGER NOT NULL,
+                  `verse` INTEGER NOT NULL,
+                  `firstReadAtEpochMillis` INTEGER NOT NULL,
+                  `lastReadAtEpochMillis` INTEGER NOT NULL,
+                  `settledReadCount` INTEGER NOT NULL,
+                  PRIMARY KEY(`shlokaId`)
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS `shlokas_fts` USING FTS4(
+                  `sanskrit` TEXT NOT NULL,
+                  `transliteration` TEXT NOT NULL,
+                  `translationEnglish` TEXT NOT NULL,
+                  `simpleMeaning` TEXT NOT NULL,
+                  content=`shlokas`
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                """
+                INSERT INTO shlokas (
+                  id, chapter, verse, sanskrit, transliteration, translationEnglish, translationHindi,
+                  simpleMeaning, reflectionPrompt, themes, backgroundStyle, sourceTitle, sourceAttribution,
+                  sortOrder, contentStatus, searchTransliteration
+                ) VALUES (
+                  '2.47', 2, 47, 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन',
+                  'karmaṇy-evādhikāras te mā phaleṣu kadācana', 'You have a right to perform your prescribed duty', NULL,
+                  'Focus on action without clinging to the fruit of work.', 'What is the action in front of you today?',
+                  'ACTION', 'KARMA_SUNRISE', 'Scroll the Gita sample seed', 'Sample source',
+                  2047, 'SAMPLE', 'karmany-evadhikaras te ma phalesu kadacana'
+                )
+                """.trimIndent(),
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_shlokas_searchTransliteration` ON `shlokas` (`searchTransliteration`)")
+            db.execSQL("INSERT INTO bookmarks (shlokaId, createdAtEpochMillis) VALUES ('2.47', 999)")
+            db.execSQL(
+                """
+                INSERT INTO reading_history (
+                  shlokaId, chapter, verse, firstReadAtEpochMillis, lastReadAtEpochMillis, settledReadCount
+                ) VALUES ('2.47', 2, 47, 500, 800, 1)
+                """.trimIndent(),
+            )
+            db.version = 4
+        }
+
+        val migratedDb = Room.databaseBuilder(context, GitaDatabase::class.java, name)
+            .addMigrations(GitaMigrations.MIGRATION_4_5)
+            .allowMainThreadQueries()
+            .build()
+
+        // Verify existing tables survive
+        val bookmark = migratedDb.bookmarkDao().observeAll().first().single()
+        assertEquals("2.47", bookmark.shlokaId)
+        assertEquals(999L, bookmark.createdAtEpochMillis)
+
+        val history = migratedDb.readingHistoryDao().observeAll().first().single()
+        assertEquals("2.47", history.shlokaId)
+
+        // Verify journey_progress table exists and works
+        migratedDb.journeyProgressDao().save(
+            com.scrollthegita.core.database.JourneyProgressEntity(
+                journeyId = "gita_on_duty",
+                currentIndex = 3,
+                lastReadAtEpochMillis = 8888L,
+            ),
+        )
+
+        val progress = migratedDb.journeyProgressDao().find("gita_on_duty")
+        assertEquals("gita_on_duty", progress?.journeyId)
+        assertEquals(3, progress?.currentIndex)
+        assertEquals(8888L, progress?.lastReadAtEpochMillis)
 
         migratedDb.close()
     }
