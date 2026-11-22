@@ -1,3 +1,5 @@
+import java.io.FileInputStream
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -5,6 +7,13 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+}
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        FileInputStream(keystorePropertiesFile).use { load(it) }
+    }
 }
 
 android {
@@ -21,13 +30,41 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val storeFilePath = System.getenv("RELEASE_STORE_FILE")
+                ?: keystoreProperties.getProperty("storeFile")
+            val storePasswordVal = System.getenv("RELEASE_STORE_PASSWORD")
+                ?: keystoreProperties.getProperty("storePassword")
+            val keyAliasVal = System.getenv("RELEASE_KEY_ALIAS")
+                ?: keystoreProperties.getProperty("keyAlias")
+            val keyPasswordVal = System.getenv("RELEASE_KEY_PASSWORD")
+                ?: keystoreProperties.getProperty("keyPassword")
+
+            if (!storeFilePath.isNullOrBlank()) {
+                val storeFileObj = rootProject.file(storeFilePath)
+                if (storeFileObj.exists()) {
+                    storeFile = storeFileObj
+                    storePassword = storePasswordVal
+                    keyAlias = keyAliasVal
+                    keyPassword = keyPasswordVal
+                }
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            val releaseSigning = signingConfigs.getByName("release")
+            if (releaseSigning.storeFile != null) {
+                signingConfig = releaseSigning
+            }
         }
     }
 
